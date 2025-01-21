@@ -128,3 +128,12 @@ CREATE TABLE IF NOT EXISTS check_ins (
 CREATE INDEX idx_user_email ON users(email);
 CREATE INDEX idx_checkin_date ON check_ins(checkInDate);
 CREATE INDEX idx_checkin_user ON check_ins(userId);
+
+-- 创建抽奖表
+CREATE TABLE draws (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  userId INT NOT NULL,
+  drawDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+  awardName VARCHAR(255) NOT NULL,
+  awardValue INT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

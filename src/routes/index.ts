@@ -3,6 +3,7 @@ import { AuthController } from '../controllers/auth.controller';
 import { CheckInController } from '../controllers/checkin.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { UserController } from '../controllers/user.controller';
+import { LotteryController } from '../controllers/lottery.controller';
 
 const router = Router();
 
@@ -17,5 +18,9 @@ router.get('/points/history', authMiddleware, UserController.getPointsHistory);
 
 // 签到相关路由
 router.post('/checkin', authMiddleware, CheckInController.checkIn);
+
+//抽奖接口
+router.post('/user/draw', LotteryController.drawLottery);  // 用户抽奖
+router.get('/user/draw/history', LotteryController.getDrawHistory);  // 获取抽奖历史
 
 export default router;
