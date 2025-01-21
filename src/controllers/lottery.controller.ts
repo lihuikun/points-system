@@ -147,7 +147,7 @@ export class LotteryController {
 
       const offset = (page - 1) * pageSize;  // 计算查询偏移量
 
-      const history = await Draw.findAll({
+      const { rows, count } = await Draw.findAndCountAll({
         where: { userId },
         order: [['drawDate', 'DESC']],
         limit: pageSize,  // 限制返回记录数
@@ -155,19 +155,22 @@ export class LotteryController {
         attributes: ['id', 'drawDate', 'awardName', 'awardValue'],  // 只返回必要字段
       });
 
-      console.log("🚀 ~ LotteryController ~ getDrawHistory:RequestHandler= ~ history:", history)
+      console.log("🚀 ~ LotteryController ~ getDrawHistory:RequestHandler= ~ history:", rows, count)
 
-      const formattedHistory = history.map(item => ({
+      const formattedHistory = rows.map(item => ({
         id: item.id,
-        drawDate: item.drawDate,
+        drawDate: this.initDate(item.drawDate.toISOString()),
         awardName: item.awardName,
         awardValue: item.awardValue,
       }));
 
-      res.json(ResponseHandler.success(formattedHistory));
+      res.json(ResponseHandler.success({ total: count, rows: formattedHistory }));
     } catch (error) {
       console.error('获取抽奖历史失败:', error);
       res.json(ResponseHandler.error('获取抽奖历史失败'));
     }
   };
+  static initDate = (str: string) => {
+    return str.replace('T', ' ').replace(/\.\d{3}Z$/, '')
+  }
 }
