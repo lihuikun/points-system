@@ -2,6 +2,7 @@ import { RequestHandler } from 'express';
 import { User } from '../models/user.model';
 import { Draw } from '../models/draw.model';
 import { ResponseHandler } from '../utils/response';
+import { sendMail } from '../services/email'
 
 export class LotteryController {
   /**
@@ -59,6 +60,18 @@ export class LotteryController {
         // 把积分追加到用户的积分中
         await User.update({ points: user.points + lotteryResult.value }, { where: { id: userId } });
       }
+      // 发送邮件通知
+      const emailContent = `
+        用户抽奖结果如下：
+        用户邮箱: ${user.email}
+        用户昵称: ${user.nickname}
+        奖项名称: ${lotteryResult.name}
+        奖项积分: ${lotteryResult.value || '无'}
+        当前积分: ${user.points + (lotteryResult.value || 0)}
+      `;
+      if(!lotteryResult.value){
+        await sendMail('lihk180542@gmail.com', '抽奖结果通知', emailContent);
+      }
       res.json(ResponseHandler.success({ ...lotteryResult, points: user.points }));
     } catch (error) {
       console.error('抽奖失败:', error);
@@ -81,9 +94,9 @@ export class LotteryController {
       return { name: '四等奖', value: 0 };
     } else if (random < 0.5) {
       return { name: '五等奖', value: 0 };
-    } else if (random < 5) {
+    } else if (random < 2) {
       return { name: '六等奖', value: 0 };
-    } else if (random < 10) {
+    } else if (random < 5) {
       return { name: '七等奖', value: 0 };
     } else {
       return { name: '八等奖', value: Math.floor(Math.random() * 200) + 1 };
