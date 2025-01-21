@@ -42,9 +42,9 @@ export class LotteryController {
         res.json(ResponseHandler.error('积分不足，无法抽奖'));
         return;
       }
-
+      let newPoints = user.points - 200;
       // 扣除200积分
-      await User.update({ points: user.points - 200 }, { where: { id: userId } });
+      await User.update({ points: newPoints }, { where: { id: userId } });
 
       // 根据概率抽取奖项
       const lotteryResult = this.getLotteryResult();
@@ -57,8 +57,9 @@ export class LotteryController {
       });
 
       if (lotteryResult.value) {
+        newPoints += lotteryResult.value;
         // 把积分追加到用户的积分中
-        await User.update({ points: user.points + lotteryResult.value }, { where: { id: userId } });
+        await User.update({ points: newPoints }, { where: { id: userId } });
       }
       // 发送邮件通知
       const emailContent = `
@@ -69,10 +70,10 @@ export class LotteryController {
         奖项积分: ${lotteryResult.value || '无'}
         当前积分: ${user.points + (lotteryResult.value || 0)}
       `;
-      if(!lotteryResult.value){
+      if (!lotteryResult.value) {
         await sendMail('lihk180542@gmail.com', '抽奖结果通知', emailContent);
       }
-      res.json(ResponseHandler.success({ ...lotteryResult, points: user.points }));
+      res.json(ResponseHandler.success({ ...lotteryResult, points: newPoints }));
     } catch (error) {
       console.error('抽奖失败:', error);
       res.json(ResponseHandler.error('抽奖失败'));
