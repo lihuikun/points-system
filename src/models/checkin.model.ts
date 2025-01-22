@@ -30,6 +30,11 @@ CheckIn.init({
   points: {
     type: DataTypes.INTEGER,
     defaultValue: 100
+  },
+  type: {
+    type: DataTypes.STRING, // 使用 STRING 来存储不同类型，如 'sign', 'share', 等
+    allowNull: false,
+    defaultValue: 'sign' // 默认为签到类型
   }
 }, {
   sequelize,
