@@ -45,7 +45,7 @@ app.use((err: any, req: any, res: any, next: any) => {
 const syncDatabase = async () => {
   try {
     await User.sync();
-    await CheckIn.sync({ force: true });
+    await CheckIn.sync();
     console.log('数据库表同步成功');
   } catch (error) {
     console.error('数据库表同步失败:', error);
