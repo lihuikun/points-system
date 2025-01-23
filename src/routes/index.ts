@@ -5,6 +5,7 @@ import { authMiddleware } from '../middlewares/auth.middleware';
 import { UserController } from '../controllers/user.controller';
 import { LotteryController } from '../controllers/lottery.controller';
 import { WeatherController } from '../controllers/weather.controller';
+import { PostController } from '../controllers/post.controller';
 
 const router = Router();
 
@@ -27,5 +28,10 @@ router.get('/user/draw/history', LotteryController.getDrawHistory);  // 获取�
 
 // 天气接口
 router.get('/weather', WeatherController.getDailyWeather);  // 获取天气信息
+
+// 朋友圈
+router.get('/posts', PostController.getPosts);  // 获取朋友列表
+router.post('/posts', PostController.createPost);  // 添加朋友
+router.get('/posts/delete', PostController.deletePost);  // 删除朋友
 
 export default router;

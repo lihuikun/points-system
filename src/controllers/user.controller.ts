@@ -26,7 +26,7 @@ export class UserController {
     try {
       const userId = (req as any).user.id;
       const user = await User.findByPk(userId);
-      
+      const { friendId, friendList, friendEmail } = user || {}
       // 检查今天是否已签到
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -50,7 +50,10 @@ export class UserController {
         avatar: user?.avatar,
         points: user?.points,
         isCheckedIn: !!todayCheckIn,
-        continuousDays: lastCheckIn?.continuousDays || 0
+        continuousDays: lastCheckIn?.continuousDays || 0,
+        friendEmail,
+        friendList,
+        friendId
       }));
       return;
     } catch (error) {
@@ -82,7 +85,7 @@ export class UserController {
         continuousDays: item.continuousDays,
         type: '签到奖励'
       }));
-      
+
       res.json(ResponseHandler.success(formattedHistory));
       return;
     } catch (error) {

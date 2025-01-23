@@ -8,6 +8,9 @@ export class User extends Model {
   public points!: number;
   public nickname!: string;
   public avatar!: string;
+  public friendId!: number;
+  public friendList!: number[];
+  public friendEmail!: string;
 }
 
 User.init({
@@ -36,9 +39,21 @@ User.init({
   avatar: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  friendId: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  friendList: {
+    type: DataTypes.ARRAY(DataTypes.INTEGER),
+    allowNull: true
+  },
+  friendEmail: {
+    type: DataTypes.STRING(255),
+    allowNull: true
   }
 }, {
   sequelize,
   tableName: 'users',
   timestamps: false
-}); 
+});
