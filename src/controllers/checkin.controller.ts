@@ -180,7 +180,7 @@ export class CheckInController {
         return res.json(ResponseHandler.success({
           avatar: user?.avatar,
           nickname: user?.nickname,
-        },'分享已过期'));
+        }, '分享已过期'));
       }
       console.log('分享记录检查:', { userId, shareDate });
 
@@ -197,7 +197,7 @@ export class CheckInController {
         return res.json(ResponseHandler.success({
           avatar: user?.avatar,
           nickname: user?.nickname,
-        },'今天已经帮好友助力过啦~'));
+        }, '今天已经帮好友助力过啦~'));
       }
 
       // 插入分享记录
@@ -221,11 +221,106 @@ export class CheckInController {
       return res.json(ResponseHandler.success({
         avatar: user?.avatar,
         nickname: user?.nickname,
-      },'助力成功'));
+      }, '助力成功'));
 
     } catch (error) {
       console.error('分享失败:', error);
       res.status(500).json(ResponseHandler.error('分享失败'));
+    }
+  };
+  /**
+ * @swagger
+ * /api/addPoints:
+ *   post:
+ *     tags: [积分]
+ *     summary: 用户加积分接口
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *               - type
+ *               - points
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 example: "1"
+ *                 description: 用户ID
+ *               type:
+ *                 type: string
+ *                 example: "任务完成"
+ *                 description: 任务类型
+ *               points:
+ *                 type: integer
+ *                 example: 10
+ *                 description: 增加的积分
+ *     responses:
+ *       200:
+ *         description: 积分增加成功
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
+ *             example:
+ *               code: 200
+ *               msg: "积分增加成功"
+ *               data:
+ *                 totalPoints: 220
+ */
+  static addPoints: RequestHandler = async (req, res) => {
+    try {
+      const { userId, type, points } = req.body;
+
+      // 校验参数
+      if (!userId || !type || points == null) {
+        return res.status(400).json(ResponseHandler.error('缺少必要参数'));
+      }
+
+      // 获取用户信息
+      const user = await User.findByPk(userId);
+      if (!user) {
+        return res.status(404).json(ResponseHandler.error('用户不存在'));
+      }
+
+      console.log('加积分操作:', { userId, type, points });
+
+      // 插入积分记录
+      await CheckIn.create({
+        userId,
+        type,
+        points,
+        checkInDate: new Date(), // 记录当前时间
+      });
+
+      // 更新用户积分
+      await User.increment('points', {
+        by: points,
+        where: { id: userId },
+      });
+
+      // 获取更新后的用户信息
+      const updatedUser = await User.findByPk(userId);
+
+      console.log('积分增加成功:', { totalPoints: updatedUser?.points });
+
+      return res.json(
+        ResponseHandler.success(
+          {
+            avatar: user.avatar,
+            nickname: user.nickname,
+            totalPoints: updatedUser?.points,
+          },
+          '积分增加成功'
+        )
+      );
+    } catch (error) {
+      console.error('积分增加失败:', error);
+      return res.status(500).json(ResponseHandler.error('积分增加失败'));
     }
   };
 

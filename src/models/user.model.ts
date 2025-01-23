@@ -11,6 +11,7 @@ export class User extends Model {
   public friendId!: number;
   public friendList!: number[];
   public friendEmail!: string;
+  public role!: string;
 }
 
 User.init({
@@ -49,6 +50,10 @@ User.init({
     allowNull: true
   },
   friendEmail: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
+  role: {
     type: DataTypes.STRING(255),
     allowNull: true
   }

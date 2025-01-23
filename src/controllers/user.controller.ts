@@ -26,7 +26,7 @@ export class UserController {
     try {
       const userId = (req as any).user.id;
       const user = await User.findByPk(userId);
-      const { friendId, friendList, friendEmail } = user || {}
+      const { friendId, friendList, friendEmail,role } = user || {}
       // 检查今天是否已签到
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -53,7 +53,8 @@ export class UserController {
         continuousDays: lastCheckIn?.continuousDays || 0,
         friendEmail,
         friendList,
-        friendId
+        friendId,
+        role
       }));
       return;
     } catch (error) {
