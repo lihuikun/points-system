@@ -159,7 +159,7 @@ export class LotteryController {
 
       const formattedHistory = rows.map(item => ({
         id: item.id,
-        drawDate: this.initDate(item.drawDate.toISOString()),
+        drawDate: item.drawDate.toISOString(),
         awardName: item.awardName,
         awardValue: item.awardValue,
       }));
@@ -170,7 +170,4 @@ export class LotteryController {
       res.json(ResponseHandler.error('获取抽奖历史失败'));
     }
   };
-  static initDate = (str: string) => {
-    return str.replace('T', ' ').replace(/\.\d{3}Z$/, '')
-  }
 }
