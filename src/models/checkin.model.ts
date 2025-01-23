@@ -7,6 +7,7 @@ export class CheckIn extends Model {
   public checkInDate!: Date;
   public continuousDays!: number;
   public points!: number;
+  public type!: string;
 }
 
 CheckIn.init({

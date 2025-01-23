@@ -65,26 +65,28 @@ export class UserController {
 
   static getPointsHistory: RequestHandler = async (req, res) => {
     try {
-      const userId = (req as any).user.id;
+      const userId = (req as any).query.userId;
       const history = await CheckIn.findAll({
         attributes: [
           'id',
           'checkInDate',
           'points',
           'continuousDays',
+          'type',
           [sequelize.literal('DATE_FORMAT(checkInDate, "%Y-%m-%d")'), 'date']
         ],
         where: { userId },
         order: [['checkInDate', 'DESC']],
         limit: 30 // 最近30天的记录
       });
+      console.log("🚀 ~ UserController ~ getPointsHistory:RequestHandler= ~ history:", history)
 
       const formattedHistory = history.map(item => ({
         id: item.id,
         date: item.get('date'),
         points: item.points || 100, // 默认签到积分
         continuousDays: item.continuousDays,
-        type: '签到奖励'
+        type: item.type
       }));
 
       res.json(ResponseHandler.success(formattedHistory));
