@@ -6,6 +6,7 @@ import { UserController } from '../controllers/user.controller';
 import { LotteryController } from '../controllers/lottery.controller';
 import { WeatherController } from '../controllers/weather.controller';
 import { PostController } from '../controllers/post.controller';
+import { GiteeController } from '../controllers/gitee.controller';
 
 const router = Router();
 
@@ -34,5 +35,8 @@ router.get('/weather', WeatherController.getDailyWeather);  // 获取天气信�
 router.get('/posts', PostController.getPosts);  // 获取朋友列表
 router.post('/posts', PostController.createPost);  // 添加朋友
 router.get('/posts/delete', PostController.deletePost);  // 删除朋友
+
+// gitee上传图片
+router.post('/gitee/upload', GiteeController.uploadImage);
 
 export default router;
