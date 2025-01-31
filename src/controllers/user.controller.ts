@@ -26,7 +26,7 @@ export class UserController {
     try {
       const userId = (req as any).user.id;
       const user = await User.findByPk(userId);
-      const { friendId, friendList, friendEmail,role } = user || {}
+      const { friendId, friendList, friendEmail, role } = user || {}
       // 检查今天是否已签到
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -140,9 +140,9 @@ export class UserController {
   static updateUserInfo: RequestHandler = async (req, res) => {
     try {
       const userId = (req as any).user.id;
-      const { nickname, email } = req.body;
+      const { nickname, email, avatar } = req.body;
 
-      console.log('更新用户信息:', { userId, nickname, email });
+      console.log('更新用户信息:', { userId, nickname, email, avatar });
 
       // 如果要更改邮箱，先检查邮箱是否已被使用
       if (email) {
@@ -156,7 +156,7 @@ export class UserController {
       }
 
       const [updatedCount] = await User.update(
-        { nickname, email },
+        { nickname, email, avatar },
         { where: { id: userId } }
       );
 
@@ -172,7 +172,8 @@ export class UserController {
         id: updatedUser?.id,
         email: updatedUser?.email,
         nickname: updatedUser?.nickname,
-        points: updatedUser?.points
+        points: updatedUser?.points,
+        avatar: updatedUser?.avatar
       }, '更新成功'));
       return;
     } catch (error) {
