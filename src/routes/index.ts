@@ -38,6 +38,6 @@ router.get('/posts/delete', PostController.deletePost);  // 删除朋友
 
 // gitee上传图片
 router.post('/gitee/upload', GiteeController.uploadImage);
-router.post('/getHello', GiteeController.getHello);
+router.get('/getHello', GiteeController.getHello);
 
 export default router;
