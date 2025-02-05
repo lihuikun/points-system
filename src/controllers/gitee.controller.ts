@@ -147,4 +147,7 @@ export class GiteeController {
       }
     });
   };
+  static getHello(): string {
+    return 'Hello World!';
+  }
 }
