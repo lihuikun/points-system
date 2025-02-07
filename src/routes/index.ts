@@ -8,6 +8,7 @@ import { WeatherController } from '../controllers/weather.controller';
 import { PostController } from '../controllers/post.controller';
 import { GiteeController } from '../controllers/gitee.controller';
 import { TicketsController } from '../controllers/tickets.controller';
+import { GiftController } from '../controllers/gift.controller';
 
 const router = Router();
 
@@ -44,5 +45,11 @@ router.post('/gitee/upload', GiteeController.uploadImage);
 router.get('/lottery/tickets', TicketsController.getTickets);  // 获取彩票信息
 router.post('/lottery/exchange', TicketsController.exchangeTicket);  // 兑换彩票
 router.post('/lottery/regenerate', TicketsController.regenerateTickets);  // 重新生成彩票
+
+// 礼品管理
+router.get('/gifts', GiftController.getAllGifts);  // 获取礼品列表
+router.post('/gifts', GiftController.createGift);  // 添加礼品
+router.delete('/gifts/:id', GiftController.deleteGift);  // 删除礼品
+router.put('/gifts/:id', GiftController.updateGift);  // 更新礼品
 
 export default router;

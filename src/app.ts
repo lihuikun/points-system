@@ -4,6 +4,7 @@ import cors from 'cors';
 import { testConnection } from './config/database';
 import { User } from './models/user.model';
 import { CheckIn } from './models/checkin.model';
+import { Gift } from './models/gift.model';
 import { LotteryBook } from './models/lotteryBook.model';
 import { LotteryTicket } from './models/lotteryTicket.model';
 import routes from './routes';
@@ -50,6 +51,7 @@ const syncDatabase = async () => {
     await CheckIn.sync();
     await LotteryTicket.sync();
     await LotteryBook.sync();
+    await Gift.sync();
     console.log('数据库表同步成功');
   } catch (error) {
     console.error('数据库表同步失败:', error);
