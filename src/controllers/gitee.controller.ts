@@ -147,7 +147,4 @@ export class GiteeController {
       }
     });
   };
-  static getHello: RequestHandler = (req, res) =>{
-    res.json(ResponseHandler.success('Hello Gitee!'));
-  }
 }

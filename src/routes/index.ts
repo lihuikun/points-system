@@ -39,7 +39,6 @@ router.get('/posts/delete', PostController.deletePost);  // 删除朋友
 
 // gitee上传图片
 router.post('/gitee/upload', GiteeController.uploadImage);
-router.get('/getHello', GiteeController.getHello);
 
 // 彩票接口
 router.get('/lottery/tickets', TicketsController.getTickets);  // 获取彩票信息
