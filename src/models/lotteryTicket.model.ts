@@ -24,6 +24,7 @@ export class LotteryTicket extends Model {
   public breakdown!: number[] | null; // 针对一等奖等需要拆分返回的24位数组（存储为 JSON）
   public scratched!: boolean;         // 是否已兑换/刮开
   public scratchAt!: Date | null;     // 刮奖时间
+  public winnerId!: number | null;    // 刮奖后中奖者的ID
   public winnerName!: string | null;  // 刮奖后中奖者的昵称
   public winnerAvatar!: string | null;// 刮奖后中奖者的头像
   public createdAt!: Date;
@@ -60,6 +61,10 @@ LotteryTicket.init(
     },
     scratchAt: {
       type: DataTypes.DATE,
+      allowNull: true,
+    },
+    winnerId: {
+      type: DataTypes.INTEGER,
       allowNull: true,
     },
     winnerName: {

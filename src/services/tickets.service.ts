@@ -118,7 +118,7 @@ export class LotteryService {
    * @param ticketId 指定要兑换的彩票ID
    * @returns 返回兑换后的彩票信息及更新后的用户积分
    */
-  async exchangeTicketWithPoints(userId: number, userAvatar: string, userName: string, ticketId: number): Promise<{ ticket: TicketDTO; updatedPoints: number }> {
+  async exchangeTicketWithPoints(userId: number, ticketId: number): Promise<{ ticket: TicketDTO; updatedPoints: number }> {
     return await sequelize.transaction(async (t: Transaction) => {
       // 查询用户记录
       const user = await User.findOne({ where: { id: userId }, transaction: t });
@@ -145,8 +145,7 @@ export class LotteryService {
       // 更新彩票状态：标记为已兑换，记录刮奖时间及中奖用户信息
       ticket.scratched = true;
       ticket.scratchAt = new Date();
-      ticket.winnerAvatar = userAvatar;
-      ticket.winnerName = userName;
+      ticket.winnerId = userId;
       await ticket.save({ transaction: t });
 
       // 将彩票中奖积分追加到用户积分中

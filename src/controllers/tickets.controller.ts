@@ -68,9 +68,9 @@ export class TicketsController {
    */
   static exchangeTicket: RequestHandler = async (req, res) => {
     try {
-      const { userId, userAvatar, userName,ticketId } = req.body;
+      const { userId,ticketId } = req.body;
       // lotteryService.exchangeTicketWithPoints 内部完成积分扣除、彩票兑换及中奖积分追加操作
-      const { ticket, updatedPoints } = await TicketsController.lotteryService.exchangeTicketWithPoints(userId, userAvatar, userName, ticketId);
+      const { ticket, updatedPoints } = await TicketsController.lotteryService.exchangeTicketWithPoints(userId, ticketId);
       res.json(ResponseHandler.success({ ticket, updatedPoints }, '兑换成功'));
       return;
     } catch (error: any) {
