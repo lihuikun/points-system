@@ -1,6 +1,8 @@
 import { RequestHandler } from 'express';
 import { Gift } from '../models/gift.model';
+import {Redemption} from '../models/redemption.model'
 import { ResponseHandler } from '../utils/response';
+import { User } from '../models/user.model';
 
 export class GiftController {
   /**
@@ -186,6 +188,92 @@ export class GiftController {
       res.json(ResponseHandler.success(null, '礼品删除成功'));
     } catch (error) {
       res.json(ResponseHandler.error('礼品删除失败'));
+    }
+  };
+  /**
+   * @swagger
+   * /api/gifts/redeem/{id}:
+   *   post:
+   *     tags: [礼品]
+   *     summary: 兑换礼品
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         description: 礼品ID
+   *         schema:
+   *           type: integer
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               userId:
+   *                 type: integer
+   *                 description: 用户ID
+   *                 example: 123
+   *               points:
+   *                 type: integer
+   *                 description: 用户兑换礼品所需的积分
+   *                 example: 100
+   *     responses:
+   *       200:
+   *         description: 兑换成功
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   *       400:
+   *         description: 兑换失败，积分不足或库存不足
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   */
+  static redeemGift: RequestHandler = async (req, res) => {
+    try {
+      const { id } = req.params;  // 礼品ID
+      const { userId } = req.body;  // 用户ID，兑换所需积分
+      // 通过UserId查找用户积分
+      const user = await User.findByPk(userId);
+      // 查找礼品
+      const gift = await Gift.findByPk(id);
+      console.log("🚀 ~ GiftController ~ redeemGift:RequestHandler= ~ gift:", gift)
+      if (!gift) {
+        return res.json(ResponseHandler.error('礼品不存在'));
+      }
+
+      // 检查用户积分是否足够
+      if (!user || user.points < gift.points) {
+        return res.json(ResponseHandler.error('积分不足，无法兑换该礼品'));
+      }
+
+      // 检查库存是否足够
+      if (gift.stock <= 0) {
+        return res.json(ResponseHandler.error('库存不足，无法兑换该礼品'));
+      }
+
+      // 执行兑换：扣除积分并减少库存
+      gift.stock -= 1;
+      await gift.save();
+
+      // 创建兑换记录
+      const redemption = await Redemption.create({
+        userId,
+        giftId: id,
+        pointsUsed: gift.points,
+      });
+
+      // 扣除用户积分
+      await User.decrement('points', { by: gift.points, where: { id: userId } });
+
+      // 返回成功响应
+      res.json(ResponseHandler.success(redemption, '礼品兑换成功'));
+    } catch (error) {
+      console.error(error);
+      res.json(ResponseHandler.error('礼品兑换失败'));
     }
   };
 }
