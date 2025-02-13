@@ -258,6 +258,20 @@ export class GiftController {
       // 执行兑换：扣除积分并减少库存
       gift.stock -= 1;
       await gift.save();
+      console.log("🚀 ~ GiftController ~ redeemGift:RequestHandler= ~ gift:", gift,user)
+      // 创建兑换记录
+      const redemption = await Redemption.create({
+        name: gift.name,
+        userId,
+        giftId: id,
+        pointsUsed: gift.points,
+      });
+      
+      // 扣除用户积分
+      await User.decrement('points', { by: gift.points, where: { id: userId } });
+      
+      // 返回成功响应
+      res.json(ResponseHandler.success(redemption, '礼品兑换成功'));
       // 发送邮件通知
       const emailContent = `
         用户兑换礼品结果如下：
@@ -268,19 +282,6 @@ export class GiftController {
         当前积分: ${user.points - (gift.points || 0)}
       `;
       await sendMail('lihk180542@gmail.com', '兑换礼品通知', emailContent);
-      // 创建兑换记录
-      const redemption = await Redemption.create({
-        name: gift.name,
-        userId,
-        giftId: id,
-        pointsUsed: gift.points,
-      });
-
-      // 扣除用户积分
-      await User.decrement('points', { by: gift.points, where: { id: userId } });
-
-      // 返回成功响应
-      res.json(ResponseHandler.success(redemption, '礼品兑换成功'));
     } catch (error) {
       console.error(error);
       res.json(ResponseHandler.error('礼品兑换失败'));
