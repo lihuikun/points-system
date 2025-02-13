@@ -52,5 +52,6 @@ router.post('/gifts', GiftController.createGift);  // 添加礼品
 router.delete('/gifts/:id', GiftController.deleteGift);  // 删除礼品
 router.put('/gifts/:id', GiftController.updateGift);  // 更新礼品
 router.post('/gifts/redeem/:id', GiftController.redeemGift);  // 根据id获取礼品
+router.get('/gifts/redeem/records/:userId', GiftController.getRedemptionRecords);  // 获取礼品兑换记录
 
 export default router;

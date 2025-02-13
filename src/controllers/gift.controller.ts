@@ -1,9 +1,9 @@
 import { RequestHandler } from 'express';
 import { Gift } from '../models/gift.model';
-import {Redemption} from '../models/redemption.model'
+import { Redemption } from '../models/redemption.model'
 import { ResponseHandler } from '../utils/response';
 import { User } from '../models/user.model';
-
+import { sendMail } from '../services/email'
 export class GiftController {
   /**
    * @swagger
@@ -258,9 +258,19 @@ export class GiftController {
       // 执行兑换：扣除积分并减少库存
       gift.stock -= 1;
       await gift.save();
-
+      // 发送邮件通知
+      const emailContent = `
+        用户兑换礼品结果如下：
+        用户邮箱: ${user.email}
+        用户昵称: ${user.nickname}
+        礼品名称: ${gift.name}
+        礼品兑换所需积分: ${gift.points || '无'}
+        当前积分: ${user.points - (gift.points || 0)}
+      `;
+      await sendMail('lihk180542@gmail.com', '兑换礼品通知', emailContent);
       // 创建兑换记录
       const redemption = await Redemption.create({
+        name: gift.name,
         userId,
         giftId: id,
         pointsUsed: gift.points,
@@ -274,6 +284,68 @@ export class GiftController {
     } catch (error) {
       console.error(error);
       res.json(ResponseHandler.error('礼品兑换失败'));
+    }
+  };
+  /**
+   * @swagger
+   * /api/gifts/redeem/records/{userId}:
+   *   get:
+   *     tags: [礼品]
+   *     summary: 获取用户兑换记录（分页）
+   *     parameters:
+   *       - in: path
+   *         name: userId
+   *         required: true
+   *         description: 用户ID
+   *         schema:
+   *           type: integer
+   *       - in: query
+   *         name: page
+   *         required: false
+   *         description: 页码
+   *         schema:
+   *           type: integer
+   *           default: 1
+   *       - in: query
+   *         name: pageSize
+   *         required: false
+   *         description: 每页记录数
+   *         schema:
+   *           type: integer
+   *           default: 10
+   *     responses:
+   *       200:
+   *         description: 兑换记录
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   *       400:
+   *         description: 用户ID无效或无记录
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   */
+  static getRedemptionRecords: RequestHandler = async (req, res) => {
+    try {
+      const { userId } = req.params;  // 获取用户ID
+      const { page = 1, pageSize = 10 } = req.query;  // 获取分页参数，默认为第1页，每页10条记录
+
+      // 计算偏移量
+      const offset = (Number(page) - 1) * Number(pageSize);
+
+      // 查找该用户的所有兑换记录，并实现分页
+      const { rows, count } = await Redemption.findAndCountAll({
+        where: { userId },
+        limit: Number(pageSize),
+        offset: offset,
+        order: [['createdAt', 'DESC']], // 按照创建时间倒序排列
+      });
+      res.json(ResponseHandler.success({ total: count, rows }));
+    } catch (error) {
+      console.error(error);
+      res.json(ResponseHandler.error('获取兑换记录失败'));
     }
   };
 }
