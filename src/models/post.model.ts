@@ -1,6 +1,8 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database';
 import { User } from './user.model';
+import { Like } from './like.model';
+import { Comment } from './comment.model';
 
 export class Post extends Model {
   public id!: number;
@@ -47,3 +49,9 @@ Post.init(
 );
 
 Post.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+Post.hasMany(Like, { foreignKey: 'postId' });
+Post.hasMany(Comment, { foreignKey: 'postId', as: 'comments' });
+Like.belongsTo(Post, { foreignKey: 'postId' });
+Like.belongsTo(User, { foreignKey: 'userId', as: 'userInfo' });
+Comment.belongsTo(Post, { foreignKey: 'postId' });
+Comment.belongsTo(User, { foreignKey: 'userId', as: 'userInfo' });

@@ -37,6 +37,9 @@ router.get('/weather', WeatherController.getDailyWeather);  // 获取天气信�
 router.get('/posts', PostController.getPosts);  // 获取朋友列表
 router.post('/posts', PostController.createPost);  // 添加朋友
 router.get('/posts/delete', PostController.deletePost);  // 删除朋友
+router.post('/posts/comment', PostController.addComment);  // 添加评论
+router.post('/posts/like', PostController.likePost);  // 点赞朋友
+
 
 // gitee上传图片
 router.post('/gitee/upload', GiteeController.uploadImage);

@@ -11,6 +11,9 @@ import { LotteryTicket } from './models/lotteryTicket.model';
 import routes from './routes';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger';
+import { Comment } from './models/comment.model';
+import { Post } from './models/post.model';
+import { Like } from './models/like.model';
 
 dotenv.config();
 
@@ -49,11 +52,14 @@ app.use((err: any, req: any, res: any, next: any) => {
 const syncDatabase = async () => {
   try {
     await User.sync();
+    await Post.sync();
+    await Comment.sync();
     await CheckIn.sync();
     await LotteryTicket.sync();
     await LotteryBook.sync();
     await Gift.sync();
     await Redemption.sync();
+    await Like.sync();
     console.log('数据库表同步成功');
   } catch (error) {
     console.error('数据库表同步失败:', error);
