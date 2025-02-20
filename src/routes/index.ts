@@ -20,6 +20,7 @@ router.post('/auth/login', AuthController.login);
 router.get('/user/info', authMiddleware, UserController.getUserInfo);
 router.put('/user/info', authMiddleware, UserController.updateUserInfo);
 router.get('/points/history', authMiddleware, UserController.getPointsHistory);
+router.put('/user/password', authMiddleware, UserController.updatePassword);
 
 // 签到相关路由
 router.post('/checkin', authMiddleware, CheckInController.checkIn);

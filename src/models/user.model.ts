@@ -46,7 +46,7 @@ User.init({
     allowNull: true
   },
   friendList: {
-    type: DataTypes.ARRAY(DataTypes.INTEGER),
+    type: DataTypes.JSON,
     allowNull: true
   },
   friendEmail: {

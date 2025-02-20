@@ -4,6 +4,7 @@ import { CheckIn } from '../models/checkin.model';
 import { ResponseHandler } from '../utils/response';
 import { sequelize } from '../config/database';
 import { Op } from 'sequelize';
+import bcrypt from 'bcryptjs';
 
 export class UserController {
   /**
@@ -182,4 +183,75 @@ export class UserController {
       return;
     }
   };
+  /**
+ * @swagger
+ * /api/user/password:
+ *   put:
+ *     tags: [用户]
+ *     summary: 修改用户密码
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 example: "oldPassword123"
+ *                 description: "旧密码"
+ *               newPassword:
+ *                 type: string
+ *                 example: "newPassword456"
+ *                 description: "新密码"
+ *     responses:
+ *       200:
+ *         description: 修改成功
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
+ *             example:
+ *               code: 200
+ *               msg: "密码修改成功"
+ *               data: null
+ */
+static updatePassword: RequestHandler = async (req: any, res) => {
+  try {
+    const userId = req.user.id; // 假设用户 ID 存储在 req.user 中
+    const { oldPassword, newPassword } = req.body;
+
+    // 验证用户的旧密码是否正确
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.json(ResponseHandler.error('用户不存在'));
+    }
+
+    // 检查旧密码是否正确
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isPasswordValid) {
+      return res.json(ResponseHandler.error('旧密码不正确'));
+    }
+
+    // 密码强度验证（可选）
+    // if (newPassword.length < 8) { // 假设密码长度至少为 8 个字符
+    //   return res.json(ResponseHandler.error('新密码太短'));
+    // }
+
+    // 加密新密码并更新
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await user.update({
+      password: hashedPassword,
+    });
+
+    return res.json(ResponseHandler.success(null, '密码修改成功'));
+  } catch (error) {
+    console.error('修改密码失败:', error);
+    return res.json(ResponseHandler.error('修改密码失败'));
+  }
+};
 } 
